@@ -23,7 +23,7 @@ export function start<S extends object>(
 		return model ? model.model : undefined;
 	};
 	myDebugger.authorize = (player): boolean => {
-		return player.UserId === 1272479100 || RunService.IsStudio();
+		return player.UserId === 0;
 	};
 
 	const loop = new Loop<T>(world, state, myDebugger.getWidgets());
@@ -86,6 +86,7 @@ export function start<S extends object>(
 
 		UserInputService.InputBegan.Connect((input) => {
 			if (input.KeyCode === Enum.KeyCode.F4) {
+				Log.Info("Toggling debugger");
 				myDebugger.toggle();
 				(state as ClientState).debug = myDebugger.enabled;
 			}

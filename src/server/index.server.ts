@@ -4,11 +4,14 @@ import { setupTags } from "shared/setupTags";
 import { IProfile } from "./data";
 import { Network } from "shared/network";
 import { Proton } from "@rbxts/proton";
-import { Client } from "shared/components";
+import { Client, Renderable } from "shared/components";
 import { start } from "shared/start";
 import Log, { Logger } from "@rbxts/log";
 import ProfileService from "@rbxts/profileservice";
 import promiseR15 from "@rbxts/promise-character";
+import { New } from "@rbxts/fusion";
+import { Profile } from "@rbxts/profileservice/globals";
+import { AnyEntity } from "@rbxts/matter";
 
 Proton.awaitStart();
 
@@ -18,11 +21,15 @@ declare const script: { systems: Folder };
 export interface ServerState {
 	debug: boolean;
 	verbose: boolean;
+	clients: Map<number, AnyEntity>;
+	profiles: Map<Player, Profile<IProfile, unknown>>;
 }
 
 const state: ServerState = {
 	debug: true,
 	verbose: true,
+	clients: new Map(),
+	profiles: new Map(),
 };
 
 const world = start([script.systems, ReplicatedStorage.Shared.systems], state)(setupTags);
@@ -35,10 +42,18 @@ const ProfileTemplate: IProfile = {
 const GameProfileStore = ProfileService.GetProfileStore("PlayerData", ProfileTemplate);
 
 async function bootstrap() {
-	function playerRemoving(player: Player) {}
+	function playerRemoving(player: Player) {
+		state.clients.delete(player.UserId);
+		const profile = state.profiles.get(player);
+		if (profile) {
+			state.profiles.delete(player);
+			profile.Release();
+		}
+		gameProvider.saveAndCleanup(player, state, world);
+	}
+
 	function playerAdded(player: Player) {
 		function handleData() {
-			Log.Info("Handling data for player {@Player}", player);
 			const profile = GameProfileStore.LoadProfileAsync("Player_" + player.UserId);
 			if (!profile) {
 				return player.Kick("Failed to load profile");
@@ -46,16 +61,16 @@ async function bootstrap() {
 			profile.AddUserId(player.UserId);
 			profile.Reconcile();
 			profile.ListenToRelease(() => {
-				player.Kick("Profile released");
+				state.profiles.delete(player);
+				player.Kick("Session was terminated");
 			});
 			if (player.IsDescendantOf(Players)) {
-				return;
+				return state.profiles.set(player, profile);
 			}
 			return profile.Release();
 		}
 
 		function characterAdded(character: Model) {
-			Log.Info("Character added for player {@Player}", player);
 			promiseR15(character)
 				.andThen(async (model) => {
 					const playerEntity = world.spawn(
@@ -65,14 +80,28 @@ async function bootstrap() {
 								coinMultiplier: 1.0,
 							},
 						}),
+						Renderable({ model }),
 					);
+					state.clients.set(player.UserId, playerEntity);
 					gameProvider.setup(playerEntity, world, state, model);
 					character.SetAttribute("entityId", playerEntity);
 				})
 				.catch(() => {
-					player.Kick("Failed to load character");
+					player.Kick("Failed to load character data");
 				});
 		}
+
+		task.spawn(() => {
+			const leaderstats = New("Folder")({
+				Name: "leaderstats",
+				Parent: player,
+			});
+			New("NumberValue")({
+				Value: 0,
+				Name: "Money",
+				Parent: leaderstats,
+			});
+		});
 
 		handleData();
 
@@ -85,12 +114,8 @@ async function bootstrap() {
 	for (const player of Players.GetPlayers()) {
 		playerAdded(player);
 	}
-
-	Network.redeemCode.server.connect((player) => {
-		Log.Info("Redeem code from player {@Player}", player);
-	});
 }
 
-bootstrap()
-	.done((status) => Log.Info("Server Bootstrap complete with status {@Status}", status))
-	.catch(Log.Error);
+bootstrap().done((status) => {
+	Log.Info("Bootstrap complete with status {@Status}", status);
+});

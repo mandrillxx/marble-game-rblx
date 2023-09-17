@@ -5,14 +5,15 @@ import Log, { Logger } from "@rbxts/log";
 import { ClientState } from "shared/clientState";
 import { start } from "shared/start";
 import { receiveReplication } from "./receiveReplication";
+import { Network } from "shared/network";
 
 Proton.awaitStart();
 
 Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
 
 const player = Players.LocalPlayer;
-
 const character = (player.Character || player.CharacterAdded.Wait()[0]) as CharacterRigR15;
+const mouse = player.GetMouse();
 
 const state: ClientState = {
 	debug: true,
