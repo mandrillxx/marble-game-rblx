@@ -1,17 +1,16 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { GameProvider } from "./providers/game";
-import { setupTags } from "shared/setupTags";
-import { IProfile } from "./data";
-import { Network } from "shared/network";
-import { Proton } from "@rbxts/proton";
 import { Client, Renderable } from "shared/components";
+import { GameProvider } from "./providers/game";
+import { promiseR6 } from "@rbxts/promise-character";
+import { setupTags } from "shared/setupTags";
+import { AnyEntity } from "@rbxts/matter";
+import { IProfile } from "./data";
+import { Profile } from "@rbxts/profileservice/globals";
+import { Proton } from "@rbxts/proton";
 import { start } from "shared/start";
+import { New } from "@rbxts/fusion";
 import Log, { Logger } from "@rbxts/log";
 import ProfileService from "@rbxts/profileservice";
-import promiseR15 from "@rbxts/promise-character";
-import { New } from "@rbxts/fusion";
-import { Profile } from "@rbxts/profileservice/globals";
-import { AnyEntity } from "@rbxts/matter";
 
 Proton.awaitStart();
 
@@ -71,7 +70,7 @@ async function bootstrap() {
 		}
 
 		function characterAdded(character: Model) {
-			promiseR15(character)
+			promiseR6(character)
 				.andThen(async (model) => {
 					const playerEntity = world.spawn(
 						Client({

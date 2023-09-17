@@ -1,9 +1,9 @@
-import Log from "@rbxts/log";
 import { AnyEntity, World } from "@rbxts/matter";
-import { Provider } from "@rbxts/proton";
 import { ServerState } from "server/index.server";
-import { Client } from "shared/components";
 import { getOrError } from "shared/util";
+import { Provider } from "@rbxts/proton";
+import { Client } from "shared/components";
+import Log from "@rbxts/log";
 
 @Provider()
 export class GameProvider {

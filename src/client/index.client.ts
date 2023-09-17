@@ -1,18 +1,17 @@
-import { CharacterRigR15 } from "@rbxts/promise-character";
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { Proton } from "@rbxts/proton";
-import Log, { Logger } from "@rbxts/log";
-import { ClientState } from "shared/clientState";
-import { start } from "shared/start";
 import { receiveReplication } from "./receiveReplication";
-import { Network } from "shared/network";
+import { CharacterRigR6 } from "@rbxts/promise-character";
+import { ClientState } from "shared/clientState";
+import { Proton } from "@rbxts/proton";
+import { start } from "shared/start";
+import Log, { Logger } from "@rbxts/log";
 
 Proton.awaitStart();
 
 Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
 
 const player = Players.LocalPlayer;
-const character = (player.Character || player.CharacterAdded.Wait()[0]) as CharacterRigR15;
+const character = (player.Character || player.CharacterAdded.Wait()[0]) as CharacterRigR6 & { Ball: Part };
 const mouse = player.GetMouse();
 
 const state: ClientState = {
@@ -24,7 +23,7 @@ const state: ClientState = {
 start([ReplicatedStorage.Client.systems, ReplicatedStorage.Shared.systems], state)(receiveReplication);
 
 async function bootstrap() {
-	while (!state.playerId) {
+	while (!state.playerId || !character.Ball) {
 		task.wait(0.1);
 	}
 }

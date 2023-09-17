@@ -1,4 +1,6 @@
-interface Workspace extends Instance {}
+interface Workspace extends Instance {
+	CurrentCamera: Camera;
+}
 
 interface ReplicatedStorage extends Instance {
 	Shared: Folder & {
