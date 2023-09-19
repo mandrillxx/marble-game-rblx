@@ -5,6 +5,8 @@ import { ClientState } from "shared/clientState";
 import { Proton } from "@rbxts/proton";
 import { start } from "shared/start";
 import Log, { Logger } from "@rbxts/log";
+import Roact from "@rbxts/roact";
+import { App } from "./ui/app";
 
 Proton.awaitStart();
 
@@ -26,6 +28,8 @@ async function bootstrap() {
 	while (!state.playerId || !character.Ball) {
 		task.wait(0.1);
 	}
+
+	Roact.mount(<App />, player.FindFirstChildWhichIsA("PlayerGui")!);
 }
 
 bootstrap()

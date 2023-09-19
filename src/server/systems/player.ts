@@ -17,6 +17,7 @@ function player(world: World, _: ServerState) {
 				Name: "Ball",
 				Parent: character,
 				Size: new Vector3(7, 7, 7),
+				CustomPhysicalProperties: new PhysicalProperties(2.0, 1.5, 0.5),
 				Transparency: 0.5,
 				Material: Enum.Material.SmoothPlastic,
 				Shape: Enum.PartType.Ball,
