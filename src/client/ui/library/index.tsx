@@ -1,16 +1,18 @@
-import Roact from "@rbxts/roact";
+import Roact, { RefPropertyOrFunction } from "@rbxts/roact";
 
 export type BaseProps<T extends GuiObject> = Partial<WritableInstanceProperties<T>> & {
 	[key: string]: unknown;
+	ref?: RefPropertyOrFunction<T>;
 };
 
 type IFrame = Roact.PropsWithChildren<BaseProps<Frame>>;
 
-export function Frame({ Name, Position, Size, BackgroundTransparency, BackgroundColor3, children }: IFrame) {
+export function Frame({ Name, Position, Size, Visible, BackgroundTransparency, BackgroundColor3, children }: IFrame) {
 	return (
 		<frame
 			key={Name ?? "Canvas"}
 			AnchorPoint={new Vector2(0.5, 0.5)}
+			Visible={Visible ?? true}
 			BackgroundColor3={BackgroundColor3 ?? Color3.fromRGB(255, 255, 255)}
 			BackgroundTransparency={BackgroundTransparency ?? 1}
 			Position={Position ?? UDim2.fromScale(0.5, 0.5)}
@@ -21,7 +23,7 @@ export function Frame({ Name, Position, Size, BackgroundTransparency, Background
 	);
 }
 
-type IImageButton = Roact.PropsWithChildren<BaseProps<ImageButton>>;
+type IImageButton = Roact.PropsWithChildren<BaseProps<ImageButton>> & { AspectRatio: number; Clicked?: () => void };
 
 export function ImageButton({
 	Name,
@@ -30,7 +32,9 @@ export function ImageButton({
 	Image,
 	ImageColor3,
 	BackgroundTransparency,
+	Clicked,
 	children,
+	AspectRatio: IAspectRatio,
 }: IImageButton) {
 	return (
 		<imagebutton
@@ -42,15 +46,27 @@ export function ImageButton({
 			ImageColor3={ImageColor3}
 			BackgroundTransparency={BackgroundTransparency ?? 1}
 			BorderSizePixel={0}
+			Event={{
+				MouseButton1Click: Clicked,
+			}}
 		>
+			<AspectRatio AspectRatio={IAspectRatio} />
 			{children}
 		</imagebutton>
 	);
 }
 
-type IImageLabel = Roact.PropsWithChildren<BaseProps<ImageLabel>>;
+type IImageLabel = Roact.PropsWithChildren<BaseProps<ImageLabel>> & { AspectRatio?: number };
 
-export function ImageLabel({ Name, Position, Size, Image, ImageColor3, children }: IImageLabel) {
+export function ImageLabel({
+	Name,
+	Position,
+	Size,
+	Image,
+	ImageColor3,
+	AspectRatio: IAspectRatio,
+	children,
+}: IImageLabel) {
 	return (
 		<imagelabel
 			key={Name ?? "Main"}
@@ -62,6 +78,7 @@ export function ImageLabel({ Name, Position, Size, Image, ImageColor3, children 
 			BackgroundTransparency={1}
 			BorderSizePixel={0}
 		>
+			{IAspectRatio !== undefined && <AspectRatio AspectRatio={IAspectRatio} />}
 			{children}
 		</imagelabel>
 	);
@@ -116,11 +133,26 @@ export function Corner({ CornerRadius }: ICorner) {
 	return <uicorner CornerRadius={CornerRadius ?? new UDim(0, 4)} />;
 }
 
+type IListLayout = Partial<WritableInstanceProperties<UIListLayout>>;
+
+export function ListLayout({ FillDirection, HorizontalAlignment, Padding, SortOrder, VerticalAlignment }: IListLayout) {
+	return (
+		<uilistlayout
+			FillDirection={FillDirection ?? Enum.FillDirection.Vertical}
+			HorizontalAlignment={HorizontalAlignment ?? Enum.HorizontalAlignment.Center}
+			Padding={Padding ?? new UDim(0, 0)}
+			SortOrder={SortOrder ?? Enum.SortOrder.LayoutOrder}
+			VerticalAlignment={VerticalAlignment ?? Enum.VerticalAlignment.Center}
+		/>
+	);
+}
+
 type IButton = BaseProps<TextButton> & {
 	ButtonText: string;
 	Color?: ColorSequence;
 	StrokeColor?: Color3;
 	IAspectRatio?: number;
+	Clicked?: () => void;
 };
 
 export function Button({
@@ -133,6 +165,7 @@ export function Button({
 	Color,
 	StrokeColor,
 	IAspectRatio,
+	Clicked,
 }: IButton) {
 	return (
 		<imagebutton
@@ -142,6 +175,9 @@ export function Button({
 			Size={Size ?? UDim2.fromScale(0.193, 0.37)}
 			BackgroundTransparency={BackgroundTransparency ?? 0}
 			BorderSizePixel={0}
+			Event={{
+				MouseButton1Click: Clicked,
+			}}
 		>
 			<AspectRatio AspectRatio={IAspectRatio ?? 3.778} />
 			<Gradient
@@ -160,9 +196,18 @@ export function Button({
 	);
 }
 
-type ITextInput = BaseProps<TextBox>;
+type ITextInput = BaseProps<TextBox> & { setText?: (text: string) => void };
 
-export function TextInput({ Name, Position, Size, Text, PlaceholderText, TextColor3, ClearTextOnFocus }: ITextInput) {
+export function TextInput({
+	Name,
+	Position,
+	Size,
+	Text,
+	PlaceholderText,
+	TextColor3,
+	ClearTextOnFocus,
+	setText,
+}: ITextInput) {
 	return (
 		<Frame Name={Name ?? "TextInput"} Position={Position} Size={Size} BackgroundTransparency={0}>
 			<Corner CornerRadius={new UDim(0.2, 0)} />
@@ -178,6 +223,11 @@ export function TextInput({ Name, Position, Size, Text, PlaceholderText, TextCol
 				TextScaled={true}
 				TextWrapped={true}
 				Text={Text ?? ""}
+				Change={{
+					Text: (rbx) => {
+						if (setText) setText(rbx.Text);
+					},
+				}}
 				ClearTextOnFocus={ClearTextOnFocus ?? false}
 			/>
 		</Frame>

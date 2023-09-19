@@ -42,3 +42,8 @@ export const Green = new ColorSequence([
 	new ColorSequenceKeypoint(0, Color3.fromRGB(0, 175, 18)),
 	new ColorSequenceKeypoint(1, Color3.fromRGB(0, 212, 29)),
 ]);
+
+export const Red = new ColorSequence([
+	new ColorSequenceKeypoint(0, Color3.fromRGB(197, 34, 33)),
+	new ColorSequenceKeypoint(1, Color3.fromRGB(227, 53, 53)),
+]);

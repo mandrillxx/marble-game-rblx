@@ -1,10 +1,16 @@
-import Roact from "@rbxts/roact";
-import { Codes } from "./modals/codes";
+import { ModalContext, SetModalContext } from "./context/modal";
+import { Overlay } from "./overlay";
+import { Modal } from "./modals";
+import Roact, { useState } from "@rbxts/roact";
 
 export function App() {
+	const [openModal, setOpenModal] = useState<Modal>();
+
 	return (
-		<screengui>
-			<Codes />
-		</screengui>
+		<ModalContext.Provider value={openModal}>
+			<SetModalContext.Provider value={setOpenModal}>
+				<Overlay />
+			</SetModalContext.Provider>
+		</ModalContext.Provider>
 	);
 }

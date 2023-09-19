@@ -1,5 +1,5 @@
 import { ReactStory } from "client/flipbook";
-import { Codes } from "../modals/codes";
+import { Codes } from "../modals";
 import * as ReactRoblox from "@rbxts/react-roblox";
 import Roact from "@rbxts/roact";
 
@@ -14,7 +14,7 @@ const CodesStory: ReactStory = {
 	name: "Codes.story",
 	react: Roact,
 	reactRoblox: ReactRoblox,
-	story: <Codes />,
+	story: <Codes Visible={true} />,
 	summary: "Codes Story",
 };
 

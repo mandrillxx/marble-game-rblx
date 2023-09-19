@@ -1,12 +1,24 @@
-import { AspectRatio as IAspectRatio, BaseProps, Frame } from ".";
+import { AspectRatio, BaseProps, Frame } from ".";
 import Roact from "@rbxts/roact";
 
-type IContainer = Roact.PropsWithChildren<BaseProps<Frame>>;
+type IContainer = Roact.PropsWithChildren<BaseProps<Frame>> & { AspectRatio?: number };
 
-export function Container({ children }: IContainer) {
+export function Container({
+	Name,
+	Position,
+	Size,
+	BackgroundTransparency,
+	AspectRatio: IAspectRatio,
+	children,
+}: IContainer) {
 	return (
-		<Frame Name="Container" BackgroundTransparency={1} Size={UDim2.fromScale(0.479, 0.491)}>
-			<IAspectRatio AspectRatio={1.734} />
+		<Frame
+			Name={Name ?? "Container"}
+			BackgroundTransparency={BackgroundTransparency ?? 1}
+			Position={Position}
+			Size={Size ?? UDim2.fromScale(0.5, 0.5)}
+		>
+			{IAspectRatio !== undefined && <AspectRatio AspectRatio={IAspectRatio} />}
 			{children}
 		</Frame>
 	);

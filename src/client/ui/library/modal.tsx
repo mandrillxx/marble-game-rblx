@@ -13,7 +13,7 @@ export function Modal({ Name, Position, Image, Color, RingColor, children }: IMo
 		>
 			<AspectRatio AspectRatio={1.804} />
 			<Gradient Color={Color} />
-			<Ring IAspectRatio={1.824} Color={RingColor} />
+			<Ring AspectRatio={1.824} Color={RingColor} />
 			<Header Color={RingColor} />
 			<Close />
 			{children}
@@ -21,11 +21,18 @@ export function Modal({ Name, Position, Image, Color, RingColor, children }: IMo
 	);
 }
 
-function Ring({ Color, IAspectRatio, Image }: { Color: ColorSequence; IAspectRatio: number; Image?: string }) {
+type IRing = BaseProps<ImageLabel> & { Color: ColorSequence; AspectRatio: number; Image?: string };
+
+export function Ring({ Position, Size, Color, AspectRatio: IAspectRatio, Image }: IRing) {
 	return (
-		<ImageLabel Name="Ring" Size={UDim2.fromScale(0.987, 0.976)} Image={Image ?? "rbxassetid://14800624185"}>
+		<ImageLabel
+			Name="Ring"
+			Position={Position}
+			Size={Size ?? UDim2.fromScale(0.987, 0.976)}
+			Image={Image ?? "rbxassetid://14800624185"}
+		>
 			<Gradient Color={Color} />
-			<AspectRatio AspectRatio={IAspectRatio} />
+			{AspectRatio && <AspectRatio AspectRatio={IAspectRatio} />}
 		</ImageLabel>
 	);
 }
@@ -43,7 +50,7 @@ function Header({ Color }: IHeader) {
 				Image={"rbxassetid://14800937055"}
 				ImageColor3={Color3.fromRGB(24, 24, 24)}
 			>
-				<Ring IAspectRatio={7.839} Color={Color} Image="rbxassetid://14800942412" />
+				<Ring AspectRatio={7.839} Color={Color} Image="rbxassetid://14800942412" />
 				<Text Position={UDim2.fromScale(0.5, 0.447)} Size={UDim2.fromScale(0.298, 0.556)} Text="Codes" />
 			</ImageLabel>
 		</Frame>
@@ -54,11 +61,11 @@ function Close() {
 	return (
 		<ImageButton
 			Name="Close"
+			AspectRatio={1}
 			Position={UDim2.fromScale(1, 0)}
 			Size={UDim2.fromScale(0.068, 0.122)}
 			BackgroundTransparency={0}
 		>
-			<AspectRatio AspectRatio={1} />
 			<Gradient
 				Color={
 					new ColorSequence([
