@@ -4,7 +4,7 @@ import { Modal } from "./modals";
 import Roact, { useState } from "@rbxts/roact";
 
 export function App() {
-	const [openModal, setOpenModal] = useState<Modal>();
+	const [openModal, setOpenModal] = useState<Modal>("Settings");
 
 	return (
 		<ModalContext.Provider value={openModal}>

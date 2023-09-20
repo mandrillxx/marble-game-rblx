@@ -12,7 +12,7 @@ export function Codes({ Visible }: IModal) {
 	return (
 		<Canvas AspectRatio={1.779} Visible={Visible}>
 			<Container Size={UDim2.fromScale(0.479, 0.491)} AspectRatio={1.734}>
-				<Modal Image="rbxassetid://14800615603" Color={Black} RingColor={DarkOrange}>
+				<Modal Name="Codes" Image="rbxassetid://14800615603" Color={Black} RingColor={DarkOrange}>
 					<Text
 						Text={`Follow <font color="#12dbfe">@sunbear_studio</font> on Twitter for Exclusive Codes and Sneak Peeks!`}
 						RichText={true}

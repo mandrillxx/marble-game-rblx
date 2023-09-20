@@ -1,6 +1,11 @@
 import Roact, { RefPropertyOrFunction } from "@rbxts/roact";
+import { Green } from "./gradients";
 
-export type BaseProps<T extends GuiObject> = Partial<WritableInstanceProperties<T>> & {
+export type BaseProps<T extends GuiObject> = Partial<{
+	[K in keyof WritableInstanceProperties<T>]:
+		| WritableInstanceProperties<T>[K]
+		| Roact.Binding<WritableInstanceProperties<T>[K]>;
+}> & {
 	[key: string]: unknown;
 	ref?: RefPropertyOrFunction<T>;
 };
@@ -10,7 +15,6 @@ type IFrame = Roact.PropsWithChildren<BaseProps<Frame>>;
 export function Frame({ Name, Position, Size, Visible, BackgroundTransparency, BackgroundColor3, children }: IFrame) {
 	return (
 		<frame
-			key={Name ?? "Canvas"}
 			AnchorPoint={new Vector2(0.5, 0.5)}
 			Visible={Visible ?? true}
 			BackgroundColor3={BackgroundColor3 ?? Color3.fromRGB(255, 255, 255)}
@@ -23,7 +27,12 @@ export function Frame({ Name, Position, Size, Visible, BackgroundTransparency, B
 	);
 }
 
-type IImageButton = Roact.PropsWithChildren<BaseProps<ImageButton>> & { AspectRatio: number; Clicked?: () => void };
+type IImageButton = Roact.PropsWithChildren<BaseProps<ImageButton>> & {
+	MouseEnter?: () => void;
+	MouseLeave?: () => void;
+	AspectRatio: number;
+	Clicked?: () => void;
+};
 
 export function ImageButton({
 	Name,
@@ -35,10 +44,11 @@ export function ImageButton({
 	Clicked,
 	children,
 	AspectRatio: IAspectRatio,
+	MouseEnter,
+	MouseLeave,
 }: IImageButton) {
 	return (
 		<imagebutton
-			key={Name ?? "Main"}
 			AnchorPoint={new Vector2(0.5, 0.5)}
 			Position={Position ?? UDim2.fromScale(0.5, 0.5)}
 			Size={Size}
@@ -48,6 +58,8 @@ export function ImageButton({
 			BorderSizePixel={0}
 			Event={{
 				MouseButton1Click: Clicked,
+				MouseEnter: MouseEnter,
+				MouseLeave: MouseLeave,
 			}}
 		>
 			<AspectRatio AspectRatio={IAspectRatio} />
@@ -69,7 +81,6 @@ export function ImageLabel({
 }: IImageLabel) {
 	return (
 		<imagelabel
-			key={Name ?? "Main"}
 			AnchorPoint={new Vector2(0.5, 0.5)}
 			Position={Position ?? UDim2.fromScale(0.5, 0.5)}
 			Size={Size}
@@ -101,7 +112,6 @@ type IText = BaseProps<TextLabel> & { Thickness?: number };
 export function Text({ Name, Text, Position, Size, RichText, TextColor3, Thickness }: IText) {
 	return (
 		<textlabel
-			key={Name ?? "Text"}
 			BackgroundTransparency={1}
 			BorderSizePixel={0}
 			AnchorPoint={new Vector2(0.5, 0.5)}
@@ -125,6 +135,19 @@ type IStroke = Partial<WritableInstanceProperties<UIStroke>>;
 
 export function Stroke({ Thickness }: IStroke) {
 	return <uistroke Thickness={Thickness ?? 3} Color={Color3.fromRGB(0, 0, 0)} />;
+}
+
+type IPadding = { right?: number; left?: number; top?: number; bottom?: number };
+
+export function Padding({ right, left, top, bottom }: IPadding) {
+	return (
+		<uipadding
+			PaddingRight={new UDim(right, 0) ?? new UDim(0, 0)}
+			PaddingLeft={new UDim(left, 0) ?? new UDim(0, 0)}
+			PaddingTop={new UDim(top, 0) ?? new UDim(0, 0)}
+			PaddingBottom={new UDim(bottom, 0) ?? new UDim(0, 0)}
+		/>
+	);
 }
 
 type ICorner = Partial<WritableInstanceProperties<UICorner>>;
@@ -169,7 +192,6 @@ export function Button({
 }: IButton) {
 	return (
 		<imagebutton
-			key={Name ?? "Button"}
 			AnchorPoint={new Vector2(0.5, 0.5)}
 			Position={Position ?? UDim2.fromScale(0.5, 0.5)}
 			Size={Size ?? UDim2.fromScale(0.193, 0.37)}
@@ -180,15 +202,7 @@ export function Button({
 			}}
 		>
 			<AspectRatio AspectRatio={IAspectRatio ?? 3.778} />
-			<Gradient
-				Color={
-					Color ??
-					new ColorSequence([
-						new ColorSequenceKeypoint(0, Color3.fromRGB(0, 181, 20)),
-						new ColorSequenceKeypoint(1, Color3.fromRGB(0, 206, 27)),
-					])
-				}
-			/>
+			<Gradient Color={Color ?? Green} />
 			<Stroke Color={StrokeColor ?? Color3.fromRGB(1, 144, 16)} />
 			<Corner CornerRadius={new UDim(0.296, 0)} />
 			<Text Size={UDim2.fromScale(0.463, 0.754)} Text={ButtonText} TextColor3={TextColor3} Thickness={2} />
@@ -231,5 +245,31 @@ export function TextInput({
 				ClearTextOnFocus={ClearTextOnFocus ?? false}
 			/>
 		</Frame>
+	);
+}
+
+type IScrollingFrame = Roact.PropsWithChildren<BaseProps<ScrollingFrame> & { AspectRatio: number }>;
+
+export function ScrollingFrame({
+	Name,
+	Position,
+	Size,
+	BackgroundTransparency,
+	AspectRatio: IAspectRatio,
+	children,
+}: IScrollingFrame) {
+	return (
+		<scrollingframe
+			AnchorPoint={new Vector2(0.5, 0.5)}
+			Position={Position ?? UDim2.fromScale(0.5, 0.5)}
+			Size={Size}
+			BackgroundTransparency={BackgroundTransparency ?? 1}
+			BorderSizePixel={0}
+			ScrollBarThickness={12}
+			ScrollBarImageColor3={Color3.fromRGB(62, 62, 62)}
+		>
+			<AspectRatio AspectRatio={IAspectRatio} />
+			{children}
+		</scrollingframe>
 	);
 }

@@ -1,24 +1,40 @@
-import { Corner, Gradient, ImageButton, ImageLabel, ListLayout, Text } from "./library";
+import { AspectRatio, Corner, Gradient, ImageButton, ImageLabel, ListLayout, Text } from "./library";
 import { Black, Blue, DarkOrange, Orange, Purple, Red, Silver } from "./library/gradients";
 import { SetModalContext } from "./context/modal";
 import { Modal as IModal } from "./modals";
-import { useContext } from "@rbxts/roact";
+import { useContext, useState } from "@rbxts/roact";
 import { Container } from "./library/container";
 import { Ring } from "./library/modal";
 import Roact from "@rbxts/roact";
+import { useSpring } from "@rbxts/rbx-react-spring";
 
 type IHUDButton = { Modal: IModal; Color: ColorSequence; Image: string };
 
 function HUDButton({ Modal, Color, Image }: IHUDButton) {
+	const [hovering, setHovering] = useState(false);
 	const setOpenModal = useContext(SetModalContext);
+
+	const { size } = useSpring(
+		{
+			config: {
+				mass: 0.5,
+			},
+			size: hovering ? UDim2.fromScale(0.249 * 1.5, 0.802 * 1.5) : UDim2.fromScale(0.249, 0.802),
+		},
+		[hovering],
+	);
 
 	return (
 		<ImageButton
-			Name={Modal}
-			Size={UDim2.fromScale(0.249, 0.802)}
+			key={Modal}
 			AspectRatio={1}
+			Size={size}
+			Image={Image}
+			MouseEnter={() => setHovering(true)}
+			MouseLeave={() => setHovering(false)}
 			Clicked={() => setOpenModal(Modal)}
 		>
+			<AspectRatio AspectRatio={1} />
 			<Container
 				Name="Main"
 				Position={UDim2.fromScale(0.5, 0.5)}
